@@ -1,0 +1,68 @@
+﻿@page "/Events"
+
+<h3>EventList</h3>
+
+@if(Events == null)
+{
+	<p><a>Carregando...</a></p>
+}
+else{
+	<a class="btn btn-primary mb-3 me-2" href="/Events/Create">Adicionar Evento</a>
+
+	<table class="table mb-5 table-bordered table-striped">
+		<thead class="table-primary">
+			<tr>
+				<th>Id</th>
+				<th>Título</th>
+				<th>Descrição</th>
+				<th>Data Início</th>
+				<th>Dia Todo</th>
+				<th style="white-space: nowrap; width:10px">
+					<a class="btn btn-primary btn-sm">Editar</a>
+					<button class="btn btn-danger btn-sm">Remover</button>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+
+			@foreach(var evento in Events)
+			{
+				<tr>
+					<td>@evento.Id</td>
+					<td>@evento.Title</td>
+					<td>@evento.Description</td>
+					<td>@evento.StartDate</td>
+					<td>
+						@if(evento.AllDay)
+						{
+							<span class="badge rounded-pill text-bg-sucess">Sim</span>
+						}
+						else{
+							<span class="badge rounded-pill text-bg-warning">Não</span>
+
+						}
+
+					</td>
+					<td style="white-space: nowrap; width:10px">
+						<a class="btn btn-primary btn-sm" href="/Events/Edit/@evento.Id">Editar</a>
+						<button class="btn btn-danger btn-sm">Remover</button>
+					</td>
+				</tr>
+			}
+			
+		</tbody>
+	</table>
+
+}
+
+
+@inject HttpClient http;
+@code {
+	private List<Event>? Events;
+
+	protected override async Task OnInitializedAsync()
+	{
+		Events = await http.GetFromJsonAsync<List<Event>>("/api/Events"); 
+	}
+
+}
