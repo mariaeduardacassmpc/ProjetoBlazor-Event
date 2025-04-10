@@ -1,0 +1,51 @@
+﻿@page "/Events/Create"
+
+<div class="row mb-5">
+	<div class="mb-5">
+		<h1 class="mb-5">Novo Evento</h1>
+
+		<div class="row mb-3">
+			<label class="col-md-4 col-form-label">Título></label
+			<input class="form-control" @bind="EventDtoData.Title" />"
+
+		</div>
+		<div class="row mb-3">
+			<label class="col-md-4 col-form-label">Data Inicio</label>
+			<div class="col-md-8">
+				<input type="datetime-local" class="form-control" @bind="EventDtoData.StartDate" />"
+			</div>
+		</div>
+		<div class="row mb-3">
+			<label class="col-md-4 col-form-label">Data Fim></label>
+			<input type="datetime-local" class="form-control" @bind="EventDtoData.EndDate" />"
+		</div>
+		<div class="row mb-3">
+			<label class="col-md-4 col-form-label">Descrição></label
+			<textarea class="form-control" @bind="EventDtoData.Description" />"
+		</div>
+		<dia class="row mb-3">
+			<div class="col-md-8 offset-md-4">
+				<div class="form-check">
+					<input class="form-chekc-input" type="checkbox" @bind="EventDtoData.AllDay" />
+					<label class="form-check-label">Dia Todo</label>
+				</div>
+			</div>
+		</dia>
+
+		<div class="row"
+			<div class="offset-md-4 col-md-4 d-grid">
+				<button class="btn btn-primary">Salvar</button>
+			</div>	
+			<div class="cl-md-4 d-grid">
+				<a class="btn btn-outline-primary" href="/Events">Cancelar</a>
+			</div>
+		</div>
+	</div>
+
+</div>
+<h3>CreateEvent</h3>
+
+@code {
+	public EventDTO EventDtoData { get; set; } = new();
+}
+

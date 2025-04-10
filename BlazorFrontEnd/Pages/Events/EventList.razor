@@ -1,4 +1,5 @@
 ﻿@page "/Events"
+@using CurrieTechnologies.Razor.SweetAlert2
 
 <h3>EventList</h3>
 
@@ -45,7 +46,9 @@ else{
 					</td>
 					<td style="white-space: nowrap; width:10px">
 						<a class="btn btn-primary btn-sm" href="/Events/Edit/@evento.Id">Editar</a>
-						<button class="btn btn-danger btn-sm">Remover</button>
+						<button class="btn btn-danger btn-sm"
+						onclick="async() => await DeleteEvent(evento.Id)">
+						Remover</button>
 					</td>
 				</tr>
 			}
@@ -57,6 +60,8 @@ else{
 
 
 @inject HttpClient http;
+@inject SweetAlertService Swal;
+
 @code {
 	private List<Event>? Events;
 
@@ -65,4 +70,23 @@ else{
 		Events = await http.GetFromJsonAsync<List<Event>>("/api/Events"); 
 	}
 
+	private async Task DeleteEvent(int id)
+	{
+		SweetAlertResult result1 = await Swal.FireAsync(new SweetAlertOptions
+		{
+				Title = "Você tem certeza?",
+				Text = "Você não poderá reverter isso!",
+				Icon = SweetAlertIcon.Warning,
+				ShowCancelButton = true,
+				ConfirmButtonText = "Remover",
+				CancelButtonText = "Cancelar",
+				ReverseButtons = true
+		});
+
+		if (!string.IsNullOrEmpty(result1.Value))
+		{
+			await http.DeleteAsync("/api/Events/" + id);
+			Events = await http.GetFromJsonAsync<List<Event>>("/api/Events");
+		}
+	}
 }
