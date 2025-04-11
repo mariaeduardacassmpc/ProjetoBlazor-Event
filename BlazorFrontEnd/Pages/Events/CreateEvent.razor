@@ -1,4 +1,5 @@
 ﻿@page "/Events/Create"
+@using System.Text.Json.Nodes
 
 <div class="row mb-5">
 	<div class="mb-5">
@@ -7,21 +8,24 @@
 		<div class="row mb-3">
 			<label class="col-md-4 col-form-label">Título></label
 			<input class="form-control" @bind="EventDtoData.Title" />"
-
+			<span class="text-danger">@Erros["Title"]?[0]</span>
 		</div>
 		<div class="row mb-3">
 			<label class="col-md-4 col-form-label">Data Inicio</label>
 			<div class="col-md-8">
 				<input type="datetime-local" class="form-control" @bind="EventDtoData.StartDate" />"
+				<span class="text-danger">@Erros["StartDate"]?[0]</span>
 			</div>
 		</div>
 		<div class="row mb-3">
 			<label class="col-md-4 col-form-label">Data Fim></label>
 			<input type="datetime-local" class="form-control" @bind="EventDtoData.EndDate" />"
+			<span class="text-danger">@Erros["EndDAte"]?[0]</span>
 		</div>
 		<div class="row mb-3">
 			<label class="col-md-4 col-form-label">Descrição></label
 			<textarea class="form-control" @bind="EventDtoData.Description" />"
+			<span class="text-danger">@Erros["Description"]?[0]</span>
 		</div>
 		<dia class="row mb-3">
 			<div class="col-md-8 offset-md-4">
@@ -41,11 +45,31 @@
 			</div>
 		</div>
 	</div>
-
 </div>
-<h3>CreateEvent</h3>
+
+@inject HttpClient http; 
+@inject NavigationManager navigationManager; 
 
 @code {
 	public EventDTO EventDtoData { get; set; } = new();
+    public JsonNode Erros { get; set; } = new JsonObject();
+
+	private async Task SaveEvent(){
+		var response = await http.PostAsJsonAsync("/api/Events", EventDtoData);
+		if(response.IsSuccessStatusCode){
+			navigationManager.NavigateTo("/Events");
+		}
+		else{
+			var stringResponse = await response.Content.ReadAsStringAsync();
+			try{
+
+				var jsonResponse = JsonNode.Parse(stringResponse);
+				Erros = jsonResponse["errors"] ?? new JsonObject();
+			}
+			catch(Exception){
+
+			}
+		}
+	}
 }
 

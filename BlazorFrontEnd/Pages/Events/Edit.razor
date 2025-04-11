@@ -1,0 +1,113 @@
+﻿@page "/Events/Edit/{Id:int}"
+@using System.Text.Json.Nodes
+
+<div class="row mb-5">
+	<div class="mb-5">
+		<h1 class="mb-5">Editar Evento</h1>
+
+		@if (Event == null)
+		{
+			<p><em>Carregando</em></p>
+		}
+		else
+		{
+			<div class="row mb-3">
+				<label class="col-md-4 col-form-label">Event Id</label>
+				<input class="form-control-plaintext" value="@Id" readonly />
+			</div>
+
+			<div class="row mb-3">
+				<label class="col-md-4 col-form-label">Título</label>
+				<input class="form-control" @bind="EventDtoData.Title" />
+				<span class="text-danger">@Erros["Title"]?[0]</span>
+			</div>
+
+			<div class="row mb-3">
+				<label class="col-md-4 col-form-label">Data Início</label>
+				<div class="col-md-8">
+					<input type="datetime-local" class="form-control" @bind="EventDtoData.StartDate" />
+					<span class="text-danger">@Erros["StartDate"]?[0]</span>
+				</div>
+			</div>
+
+			<div class="row mb-3">
+				<label class="col-md-4 col-form-label">Data Fim</label>
+				<input type="datetime-local" class="form-control" @bind="EventDtoData.EndDate" />
+				<span class="text-danger">@Erros["EndDate"]?[0]</span>
+			</div>
+
+			<div class="row mb-3">
+				<label class="col-md-4 col-form-label">Descrição</label>
+				<textarea class="form-control" @bind="EventDtoData.Description"></textarea>
+				<span class="text-danger">@Erros["Description"]?[0]</span>
+			</div>
+
+			<div class="row mb-3">
+				<div class="col-md-8 offset-md-4">
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" @bind="EventDtoData.AllDay" />
+						<label class="form-check-label">Dia Todo</label>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="offset-md-4 col-md-4 d-grid">
+					<button class="btn btn-primary" @onclick="Save">Salvar</button>
+				</div>
+				<div class="col-md-4 d-grid">
+					<a class="btn btn-outline-primary" href="/Events">Cancelar</a>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+
+@inject HttpClient http
+@inject NavigationManager navigationManager	
+@code {
+	[Parameter]
+	public int Id { get; set; }
+	public Event? Event { get; set; }
+	public EventDTO EventDtoData { get; set; } = new();
+	public JsonNode Erros { get; set; } = new JsonObject();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		try
+		{
+			Event = await http.GetFromJsonAsync<Event>($"/api/Events/{Id}");
+			EventDtoData.Title = Event?.Title ?? "";
+			EventDtoData.Description = Event?.Description ?? "";
+			EventDtoData.StartDate = Event?.StartDate ?? DateTime.Now;
+			EventDtoData.EndDate = Event?.EndDate;
+			EventDtoData.AllDay = Event?.AllDay ?? false;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+		}
+	}
+
+	public async Task Save()
+	{
+		var response = await http.PutAsJsonAsync("/api/Events" + Id, EventDtoData);
+		if (response.IsSuccessStatusCode){
+			navigationManager.NavigateTo("/Events");
+		}
+		else
+		{
+			var stringResponse = await response.Content.ReadAsStringAsync();
+			try
+			{
+				var jsonResponse = JsonNode.Parse(stringResponse);
+				Erros = jsonResponse["errors"] ?? new JsonObject();
+			}
+			catch (Exception)
+			{
+				Console.WriteLine("Erro ao processar a resposta do servidor.");
+			}	
+		}
+	}
+}
