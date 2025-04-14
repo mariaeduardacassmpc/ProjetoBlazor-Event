@@ -1,4 +1,4 @@
-﻿<div class="mb-5 id="eventAgendaId">
+﻿<div class="mb-5" id="eventAgendaId">
 	<div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -14,22 +14,22 @@
 						<div class="col-12">
 							<label class="form-label">Título</label>
 							<input class="form-control" id="eventModal_event_title"
-								   required>
+						   required>
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">Data Início</label>
 							<input type="datetime-local" class="form-control"
-								   id="eventModal_event_start_date" required>
+							   id="eventModal_event_start_date" required>
 						</div>
 						<div class="col-md-6">
 							<label class="form-label">Data Fim</label>
 							<input type="datetime-local" class="form-control"
-								   id="eventModal_event_end_date">
+							   id="eventModal_event_end_date">
 						</div>
 						<div class="col-12">
 							<label class="form-label">Descrição</label>
 							<textarea class="form-control"
-									  id="eventModal_event_description" rows="3"></textarea>
+							   id="eventModal_event_description" rows="3"></textarea>
 						</div>
 					</div>
 				</div>
@@ -54,7 +54,7 @@
 
 @inject IJSRuntime JSRuntime
 @code {
-	protected override async Task OnAfterRenderAysnc(bool firstRender)
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{

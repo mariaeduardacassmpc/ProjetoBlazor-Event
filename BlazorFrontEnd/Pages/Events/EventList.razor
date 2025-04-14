@@ -1,29 +1,85 @@
 ﻿@page "/Events"
-<div class="row mb-30">
-	<div class="col">
-		<h1>Lista de Eventos</h1>
+@using CurrieTechnologies.Razor.SweetAlert2
+<h1>Lista de Eventos</h1>
 
-	</div>
-	<div class="col">
-		<div class="form-check form-switch form-check-reverse">
-			<input class="form-check-input" type="checkbox" role="switch" @bind="showAgenda"/>
-			<label class="form-check-label @(showAgenda ? "text-dark" : "text-secondary")" >Calendário</label>
-		</div>
-	</div>
-</div>
 
+@if(Events == null){
+	<p><em>Carregando...</em></p>
+}
+else{
+	<a class="btn btn-primary mb-3 me-2" href="/Events/Create">Adicionar Evento</a>
+	<table class="table mb-5 table-bordered table-striped">
+		<thead class="table-primary">
+			<tr>
+				<th>Id</th>
+				<th>Título</th>
+				<th>Descrição</th>
+				<th>Data Início</th>
+				<th>Dia Todo</th>
+				<th>Ações</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach(var evento in Events){
+				<tr>
+					<td>@evento.Id</td>
+					<td>@evento.Title</td>
+					<td>@evento.Description</td>
+					<td>@evento.StartDate</td>
+					<td>
+						@if(evento.AllDay){
+							<span class="badge rounded-pill text-bg-success">Sim</span>
+						}
+						else
+						{
+							<span class="badge rounded-pill text-bg-warning">Não</span>
+						}
+
+					</td>
+					<td style="white-space: nowrap; width:10px">
+						<a class="btn btn-primary btn-sm" href"/Events/Edit/@evento.Id">Editar</a>
+						<button class="btn btn-danger btn-sm"
+						@onclick="async () => await DeleteEvent(evento.Id)">Remover</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
 
 @if(showAgenda)
 {
-	
+
 	<EventListAgenda></EventListAgenda>
 }
 else
 {
 	<EventListTable></EventListTable>
 }
-)
+
+@inject SweetAlertService Swal
+@inject HttpClient http;
 @code{
+	private List<Event>? Events;
+	protected override async Task OnInitializedAsync(){
+		Events = await http.GetFromJsonAsync<List<Event>>("/api/Events");
+	}
+
+	private async Task DeleteEvent(int id){
+		SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+        {
+				Title = "Tem Certeza?",
+				Text = "Essa ação não poderá ser desfeita",
+				Icon = SweetAlertIcon.Warning,
+				ShowCancelButton = true,
+				ConfirmButtonText = "Remover",
+				CancelButtonText = "Cancelar"
+		});
+		if(!string.IsNullOrEmpty(result.Value)){
+			await http.DeleteAsync("/api/Events/" + id);
+
+		}
+	}
 	private bool showAgenda;
 
 }
